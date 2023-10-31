@@ -30,7 +30,13 @@ describe("Test Cases Using Hooks",()=>{
         //Step 1 Find a common element which is the same for everyone and then iterate through each and whenevere found add that item to cart
         //Step 2 once we got the text we will add this item into the cart. Same Stratergy for the button (Add to Cart) to click on it.
         //Step 3 once we write the logic we will write the function in commands.js file and assign the entire function to a command and just call that whenever we want to validate the fucntion (Add to cart)
-        cy.selectProduct('iphone X')
+        
+        //using globalthis to fetch productname from fixtures 
+        
+        // iterate through for loop and get the products intop the cart
+        globalThis.data.productName.forEach(function(element) {
+            cy.selectProduct(element)
+        });
         
     
     })
