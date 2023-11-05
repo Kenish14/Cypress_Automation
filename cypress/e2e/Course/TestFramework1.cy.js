@@ -1,4 +1,7 @@
 /// <reference types="Cypress"/>
+//importing homepage object file and ShopPage Files
+import HomePage from "../pageObjects/HomePage"
+import ShopPage from "../pageObjects/ShopPage"
 describe("Test Cases Using Hooks",()=>{
     
     before(function() {
@@ -11,21 +14,24 @@ describe("Test Cases Using Hooks",()=>{
      })
     
     it("Using Before Hook and Validating other Assertions ",()=>{
+        //using objects created from homepage.js direclty.
+        const homePage=new HomePage()
         cy.visit("https://rahulshettyacademy.com/angularpractice/")
-        cy.get("input[name='name']:nth-child(2)").type(globalThis.data.name)
-        cy.get('select').select(globalThis.data.gender)
+        homePage.getNameBox().type(globalThis.data.name)
+        homePage.getGender().select(globalThis.data.gender)
         // Validation1- validating if bob is present in two binding box or not
-        cy.get(":nth-child(4) > .ng-untouched").should('have.value',globalThis.data.name)
+        homePage.getTwoWayBox().should('have.value',globalThis.data.name)
         // Validation 2- we will validate that the attribute of the element. here we will check that minimum length attribute length is 2 or not
-        cy.get("input[name='name']:nth-child(2)").should('have.attr','minlength','2') 
+        //h.should('have.attr','minlength','2') 
         //Validation 3- we will check if the radio button is diabled or not
-        cy.get('#inlineRadio3').should('be.disabled')
+        homePage.getEntrepruener().should('be.disabled')
         
     })
 
     it("Validating Shop",()=>{
+        const shop=new ShopPage()
         cy.visit("https://rahulshettyacademy.com/angularpractice/")
-        cy.get("body > app-root:nth-child(1) > app-navbar:nth-child(1) > div:nth-child(1) > nav:nth-child(1) > ul:nth-child(2) > li:nth-child(2) > a:nth-child(1)").click()
+        shop.getShop().click()
         // we will write a function to add multiple items in the cart
         //Step 1 Find a common element which is the same for everyone and then iterate through each and whenevere found add that item to cart
         //Step 2 once we got the text we will add this item into the cart. Same Stratergy for the button (Add to Cart) to click on it.
@@ -34,10 +40,39 @@ describe("Test Cases Using Hooks",()=>{
         //using globalthis to fetch productname from fixtures 
         
         // iterate through for loop and get the products intop the cart
+        //use cy.pause() to check if everything is fine and debugg the code. basically works as a check point.
         globalThis.data.productName.forEach(function(element) {
             cy.selectProduct(element)
         });
+        //Do the end-to-end testing using page object class for shop page,
+        shop.getCheckout().click()
+        var sum=0
+        shop.getProductPrice().each(($el,index,$list)=>{
+        //telling javascript that this is not a string but a number.
+           
+            const actualText=$el.text()
+            var res=actualText.split(" ")
+            res=res[1].trim()
+            //cy.log(res)
+            sum=Number(sum)+Number(res)
+        //resolving promise so that it works synchronously.
+        }).then(function()
+        {
+            cy.log(sum)
+        })
+        cy.get('h3 strong').then(function(element){
+            const text=element.text()
+            var res=text.split(" ")
+            var total=res[1].trim()
+            expect(Number(total)).equal(sum)
+        })
         
-    
+        shop.getCheckoutCart().click()
+        shop.getCountry().type("India")
+        shop.getCountryPopUp().click()
+        shop.getCheckBoxCheckout().click({force:true})
+        shop.getPurchaseButton().click()
+        shop.getAlertText().contains("Success")
+        
     })
 })
