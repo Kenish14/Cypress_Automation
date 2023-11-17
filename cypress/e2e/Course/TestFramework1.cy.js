@@ -16,7 +16,8 @@ describe("Test Cases Using Hooks",()=>{
     it("Using Before Hook and Validating other Assertions ",()=>{
         //using objects created from homepage.js direclty.
         const homePage=new HomePage()
-        cy.visit("https://rahulshettyacademy.com/angularpractice/")
+        //using env variable to fetch url.
+        cy.visit(Cypress.env('url')+"/angularpractice/")
         homePage.getNameBox().type(globalThis.data.name)
         homePage.getGender().select(globalThis.data.gender)
         // Validation1- validating if bob is present in two binding box or not
